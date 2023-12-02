@@ -1,14 +1,12 @@
 #include <SDL.h>
 #include <SDL_image.h>
 
+#include "engine.h"
 #include "global.h"
 #include "log.h"
-#include "renderer.h"
-#include "texture.h"
 
 i32 Texture::load(char *filename)
 {
-    Renderer    *renderer    = global.renderer;
     SDL_Surface *tmp_surface = IMG_Load(filename);
 
     if (tmp_surface == nullptr)
@@ -20,8 +18,7 @@ i32 Texture::load(char *filename)
     }
     else
     {
-        this->texture =
-            SDL_CreateTextureFromSurface(renderer->getRenderer(), tmp_surface);
+        this->texture = SDL_CreateTextureFromSurface(global.rend, tmp_surface);
 
         if (this->texture == nullptr)
         {
@@ -56,11 +53,10 @@ void Texture::init(
 
 void Texture::renderXYClip(i32 x, i32 y, SDL_Rect *cliprect)
 {
-    Renderer *renderer = global.renderer;
-    this->x            = x;
-    this->y            = y;
-    this->cliprect     = cliprect;
-    SDL_Rect quad      = {this->x, this->y, this->width, this->height};
+    this->x        = x;
+    this->y        = y;
+    this->cliprect = cliprect;
+    SDL_Rect quad  = {this->x, this->y, this->width, this->height};
     if (this->cliprect != nullptr)
     {
         quad.w = this->cliprect->w;
@@ -68,6 +64,6 @@ void Texture::renderXYClip(i32 x, i32 y, SDL_Rect *cliprect)
     }
 
     SDL_RenderCopyEx(
-        renderer->getRenderer(), this->texture, this->cliprect, &quad,
-        this->angle, this->center, this->fliptype);
+        global.rend, this->texture, this->cliprect, &quad, this->angle,
+        this->center, this->fliptype);
 }

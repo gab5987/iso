@@ -1,8 +1,8 @@
 #include <SDL.h>
 #include <SDL_image.h>
 
+#include "engine.h"
 #include "log.h"
-#include "renderer.h"
 
 void Renderer::init(void)
 {
@@ -45,9 +45,31 @@ void Renderer::init(void)
     }
 
     global.runnig = true;
+    global.wind   = this->window;
+    global.rend   = this->renderer;
 
     Logger::info("OpenGL Loaded");
     // Logger::info("Vendor:   %s", glGetString(GL_VENDOR));
     // Logger::info("Renderer: %s", glGetString(GL_RENDER));
     // Logger::info("Version:  %s", glGetString(GL_VERSION));
 }
+
+void Renderer::draw(void)
+{
+    Isometric *iso = global.iso;
+    SDL_SetRenderDrawColor(this->renderer, 0x3b, 0x3b, 0x3b, 0x00);
+    SDL_RenderClear(this->renderer);
+
+    iso->draw();
+
+    // drawIsoMouse();
+
+    // if (game.lastTileClicked != -1)
+    // {
+    //     tiles_tex.renderXYClip(0, 0, &tiles_rects[game.lastTileClicked]);
+    // }
+
+    SDL_RenderPresent(this->renderer);
+    SDL_Delay(10);
+}
+

@@ -1,8 +1,12 @@
 cmake_minimum_required(VERSION 3.10)
 
 set(TARGET_BIN "game")
+
 set(SD2_LIB_DIR ${CMAKE_SOURCE_DIR}/lib/SDL)
 set(SD2_IMAGE_LIB_DIR ${CMAKE_SOURCE_DIR}/lib/SDL2_image-2.6.3)
+
+set(DATA_DIR "${CMAKE_SOURCE_DIR}/data")
+set(BUILD_DATA_DIR "${CMAKE_BINARY_DIR}/data") 
 
 project(${TARGET_BIN})
 
@@ -31,3 +35,18 @@ target_compile_options(${TARGET_BIN} PRIVATE -g -Wall -Wextra -O0 -lSDL_image)
 set_target_properties(${TARGET_BIN} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
 )
+
+if (UNIX)
+    add_custom_command(
+        TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E create_symlink ${DATA_DIR} ${BUILD_DATA_DIR}
+        COMMENT "Creating symbolic link to data directory"
+    )
+elseif (WIN32)
+    add_custom_command(
+        TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${DATA_DIR} ${BUILD_DATA_DIR}
+        COMMENT "Copying data directory to build directory"
+    )
+endif()
+
