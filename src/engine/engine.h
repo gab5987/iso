@@ -72,14 +72,26 @@ class Texture
     void renderXYClip(i32 x, i32 y, SDL_Rect *cliprect);
 };
 
+typedef struct
+{
+    u8 x, y;
+} map_descriptor_t;
+
+typedef struct
+{
+    u16 image_w, image_h;
+    u8  cols, rows;
+    u8  tile_size;
+} texture_descriptor_t;
+
 class Isometric
 {
     private:
     static constexpr size_t MAX_MAP_SIZE = 32;
-    static constexpr size_t MAX_TILESET  = 32;
-    u16                     map[MAX_MAP_SIZE][MAX_MAP_SIZE];
+    static constexpr size_t MAX_TILESET  = 64;
+    i16                     map[MAX_MAP_SIZE][MAX_MAP_SIZE];
     SDL_Rect                tileset[MAX_TILESET];
-    Texture                 texture = Texture();
+    Texture                *texture = new Texture();
 
     public:
     u32 TILESIZE;
@@ -88,7 +100,6 @@ class Isometric
     i32 map_height;
     i32 map_width;
 
-    explicit Isometric(i32 tilesize, u16 **mapptr, size_t mapsize);
     inline void setX(i32 x)
     {
         this->scroll_x = x;
@@ -107,7 +118,16 @@ class Isometric
         return std::pair<i32, i32>(this->map_width, this->map_height);
     };
 
+    ~Isometric(void)
+    {
+        delete this->texture;
+    };
+
+    Isometric(
+        const char *text_loc, i16 (&mapptr)[MAX_MAP_SIZE][MAX_MAP_SIZE],
+        texture_descriptor_t *text_desc, map_descriptor_t *map_desc);
     void        draw(void);
+    void        center(void);
     void        setMapSize(i32 width, i32 height);
     static void conv2dToIso(point2d_t *point);
     static void convIsoTo2D(point2d_t *point);

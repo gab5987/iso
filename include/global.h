@@ -15,8 +15,8 @@ class Global
     explicit Global(void){};
 
     public:
-    i32                    wx     = 1200;
-    i32                    wy     = 720;
+    i32                    wx     = 100;
+    i32                    wy     = 100;
     bool                   runnig = false;
     static constexpr char *WNAME  = (char *)"Game";
 
@@ -24,9 +24,6 @@ class Global
     Isometric *iso      = nullptr;
     Input     *input    = nullptr;
 
-    i32 map_pos_x;
-    i32 map_pos_y;
-    i32 map_scroll_speed;
     i32 speed;
     i32 tile_click = -1;
 

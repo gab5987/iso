@@ -10,32 +10,32 @@ void Input::getMouseTileClick(void)
     point2d_t  mouse2isopoint;
     Isometric *iso = global.iso;
 
-    int correct_x = (global.map_pos_x % 32) * 2;
-    int correct_y = global.map_pos_y % 32;
-
-    mouse2isopoint.x = this->mouse.x;
-    mouse2isopoint.y = this->mouse.y;
-
-    Isometric::convIsoTo2D(&mouse2isopoint);
-
-    iso->getTileCoordinates(&mouse2isopoint, &point);
-
-    tile_shift.x = correct_x;
-    tile_shift.y = correct_y;
-    Isometric::conv2dToIso(&tile_shift);
-
-    point.x -=
-        ((float)iso->scroll_x + (float)tile_shift.x) / (float)iso->TILESIZE;
-    point.y -=
-        ((float)iso->scroll_y - (float)tile_shift.y) / (float)iso->TILESIZE;
-
-    std::pair<i32, i32> mapsize = iso->getMapSize();
-
-    if (point.x >= 0 && point.y >= 0 && point.x < mapsize.first &&
-        point.y < mapsize.second)
-    {
-        global.tile_click = iso->getMap()[point.y][point.x];
-    }
+    // int correct_x = (global.map_pos_x % 32) * 2;
+    // int correct_y = global.map_pos_y % 32;
+    //
+    // mouse2isopoint.x = this->mouse.x;
+    // mouse2isopoint.y = this->mouse.y;
+    //
+    // Isometric::convIsoTo2D(&mouse2isopoint);
+    //
+    // iso->getTileCoordinates(&mouse2isopoint, &point);
+    //
+    // tile_shift.x = correct_x;
+    // tile_shift.y = correct_y;
+    // Isometric::conv2dToIso(&tile_shift);
+    //
+    // point.x -=
+    //     ((float)iso->scroll_x + (float)tile_shift.x) / (float)iso->TILESIZE;
+    // point.y -=
+    //     ((float)iso->scroll_y - (float)tile_shift.y) / (float)iso->TILESIZE;
+    //
+    // std::pair<i32, i32> mapsize = iso->getMapSize();
+    //
+    // if (point.x >= 0 && point.y >= 0 && point.x < mapsize.first &&
+    //     point.y < mapsize.second)
+    // {
+    //     global.tile_click = iso->getMap()[point.y][point.x];
+    // }
 }
 
 void Input::update(void)
@@ -66,7 +66,7 @@ void Input::update(void)
             case SDL_MOUSEBUTTONDOWN:
                 if (this->event.button.button == SDL_BUTTON_LEFT)
                 {
-                    this->getMouseTileClick();
+                    // this->getMouseTileClick();
                 }
                 break;
 
@@ -77,33 +77,22 @@ void Input::update(void)
 
     if (keystate[SDL_SCANCODE_W])
     {
-        global.iso->scroll_x += global.map_scroll_speed;
-        global.iso->scroll_y += global.map_scroll_speed;
-        global.map_pos_y += global.map_scroll_speed;
-
-        if (global.map_pos_y > 0)
-        {
-            global.map_pos_y = 0;
-            global.iso->scroll_x += global.map_scroll_speed;
-            global.iso->scroll_y += global.map_scroll_speed;
-        }
+        global.iso->scroll_x += global.speed;
+        global.iso->scroll_y += global.speed;
     }
     if (keystate[SDL_SCANCODE_A])
     {
-        global.iso->scroll_x += global.map_scroll_speed;
-        global.iso->scroll_y -= global.map_scroll_speed;
-        global.map_pos_y -= global.map_scroll_speed;
+        global.iso->scroll_x += global.speed;
+        global.iso->scroll_y -= global.speed;
     }
     if (keystate[SDL_SCANCODE_S])
     {
-        global.iso->scroll_x -= global.map_scroll_speed;
-        global.iso->scroll_y -= global.map_scroll_speed;
-        global.map_pos_y -= global.map_scroll_speed;
+        global.iso->scroll_x -= global.speed;
+        global.iso->scroll_y -= global.speed;
     }
     if (keystate[SDL_SCANCODE_D])
     {
-        global.iso->scroll_x -= global.map_scroll_speed;
-        global.iso->scroll_y += global.map_scroll_speed;
-        global.map_pos_y += global.map_scroll_speed;
+        global.iso->scroll_x -= global.speed;
+        global.iso->scroll_y += global.speed;
     }
 }

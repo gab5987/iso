@@ -19,7 +19,8 @@ void Renderer::init(void)
 
     this->window = SDL_CreateWindow(
         Global::WNAME, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-        global.wx, global.wy, SDL_WINDOW_OPENGL);
+        global.wx, global.wy,
+        SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_MAXIMIZED);
 
     if (this->window == nullptr)
     {
@@ -51,7 +52,7 @@ void Renderer::init(void)
     Logger::info("OpenGL Loaded");
     // Logger::info("Vendor:   %s", glGetString(GL_VENDOR));
     // Logger::info("Renderer: %s", glGetString(GL_RENDER));
-    // Logger::info("Version:  %s", glGetString(GL_VERSION));
+    // Logger::info("Version:  %s", glGetString(GL_VERSION))
 }
 
 void Renderer::draw(void)

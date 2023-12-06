@@ -1,8 +1,6 @@
 #include "engine.h"
 #include "log.h"
 
-#define NUM_ISOMETRIC_TILES 5
-
 void setupRect(SDL_Rect *rect, int x, int y, int w, int h)
 {
     rect->x = x;
@@ -11,35 +9,71 @@ void setupRect(SDL_Rect *rect, int x, int y, int w, int h)
     rect->h = h;
 }
 
-Isometric::Isometric(i32 tilesize, u16 **mapptr, size_t mapsize)
+Isometric::Isometric(
+    const char           *text_loc, i16 (&mapptr)[MAX_MAP_SIZE][MAX_MAP_SIZE],
+    texture_descriptor_t *text_desc, map_descriptor_t *map_desc)
 {
-    if (tilesize <= 0)
-        this->TILESIZE = 32;
-    else
-        this->TILESIZE = tilesize;
+    if (text_loc == nullptr || mapptr == nullptr || text_desc == nullptr ||
+        map_desc == nullptr)
+    {
+        return;
+    }
+    if (text_desc->tile_size <= 0)
+    {
+        Logger::error("Loaded a texture with wrong size(< 0) | %s", text_loc);
+        return;
+    }
 
-    memcpy(this->map, mapptr, mapsize);
+    this->TILESIZE = text_desc->tile_size / 2;
 
-    this->map_height = 0;
-    this->map_width  = 0;
+    memcpy(this->map, mapptr, sizeof(this->map));
+
+    // for (u16 j = 0; j < MAX_MAP_SIZE; j++)
+    // {
+    //     for (u16 i = 0; i < MAX_MAP_SIZE; i++) printf("%d ", mapptr[j][i]);
+    //     printf("\n");
+    // }
+
+    this->map_height = map_desc->y;
+    this->map_width  = map_desc->x;
     this->scroll_x   = 0;
     this->scroll_y   = 0;
 
-    i32 x = 0;
-    i32 y = 0;
+    this->texture->init(0, 0, 0, nullptr, nullptr, SDL_FLIP_NONE);
 
-    this->texture.init(0, 0, 0, nullptr, nullptr, SDL_FLIP_NONE);
-    for (i32 i = 0; i < NUM_ISOMETRIC_TILES; ++i)
+    i32 y = 0;
+    i32 x = 0;
+    for (u8 i = 0; i < text_desc->rows; ++i)
     {
-        setupRect(&this->tileset[i], x, y, 64, 80);
-        x += 64;
+        u8 offset = i * text_desc->cols;
+        for (u8 j = 0; j < text_desc->cols; j++)
+        {
+            setupRect(
+                &this->tileset[j + offset], x, y, text_desc->tile_size,
+                text_desc->tile_size);
+            x += text_desc->tile_size;
+        }
+        x = 0;
+        y += text_desc->tile_size;
     }
 
-    if (this->texture.load((char *)"data/isotiles.png") == 0)
+    if (this->texture->load((char *)text_loc) == 0)
     {
-        Logger::error("Error, could not load texture: data/isotiles.png\n");
+        Logger::error("Could not load texture: %s", text_loc);
         exit(1);
     }
+}
+
+void Isometric::center(void)
+{
+    static Global &global = Global::getInstance();
+
+    i32 winx;
+    i32 winy;
+    SDL_GetWindowSize(global.wind, &winx, &winy);
+
+    this->scroll_x = (0.44 * winx) - 160;
+    this->scroll_y = (-0.2 * winy) - this->TILESIZE;
 }
 
 void Isometric::setMapSize(i32 width, i32 height)
@@ -76,20 +110,24 @@ void Isometric::getTileCoordinates(
 
 void Isometric::draw(void)
 {
-    i32       tile = 4;
+    i32       tile;
     point2d_t point;
 
     for (i32 i = 0; i < this->map_height; ++i)
     {
         for (i32 j = 0; j < this->map_width; ++j)
         {
+            tile = this->map[i][j];
+            if (tile < 0) continue;
+
             point.x = (j * this->TILESIZE) + this->scroll_x;
             point.y = (i * this->TILESIZE) + this->scroll_y;
 
-            tile = this->map[i][j];
+            // if (!done) printf("(%d) x: %d | y: %d\n", i, point.x, point.y);
+
             Isometric::conv2dToIso(&point);
 
-            this->texture.renderXYClip(point.x, point.y, &this->tileset[tile]);
+            this->texture->renderXYClip(point.x, point.y, &this->tileset[tile]);
         }
     }
 }
